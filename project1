@@ -1,0 +1,81 @@
+//intangible interaction project1
+//redesign a hand-sanitizer dispenser
+
+#include "Adafruit_VL53L0X.h"
+Adafruit_VL53L0X lox = Adafruit_VL53L0X();
+#define LEDPin1 4
+#define LEDPin2 5
+#define LEDPin3 9
+#define SensorPIN 2
+
+int sensorState = 0, lastState = 0;
+int dataLED= 0;
+
+void setup() {
+  // initialize the LED pin as an output:
+  pinMode(LEDPin1, OUTPUT);
+  pinMode(LEDPin2, OUTPUT);
+  pinMode(LEDPin3, OUTPUT);
+  // initialize the sensor pin as an input:
+  pinMode(SensorPIN, INPUT);
+  digitalWrite(SensorPIN, HIGH); // turn on the pullup
+
+  //set VL53L0X
+  Serial.println("Adafruit VL53L0X test");
+  if (!lox.begin()) {
+    Serial.println(F("Failed to boot VL53L0X"));
+    while (1);
+  }
+  // power
+  Serial.println(F("VL53L0X API Simple Ranging example\n\n"));
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  VL53L0X_RangingMeasurementData_t measure;
+
+  // read the state of the pushbutton value:
+  sensorState = digitalRead(SensorPIN);
+
+  // check if the sensor beam is broken
+  // if it is, the sensorState is LOW:
+  if (sensorState == LOW) {
+    // turn white LED on:
+    digitalWrite(LEDPin1, HIGH);
+
+    //set VL53L0X
+    Serial.print("Reading a measurement... ");
+    lox.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
+    int distance = measure.RangeMilliMeter;
+    if (distance < 150) {
+      Serial.print("Distance (mm): ");
+      Serial.println(distance);
+      
+      // 4led changes brightness 
+      dataLED = map(distance, 0, 150, 0, 255);
+      analogWrite(LEDPin3, dataLED);
+    if(distance>75 && distance <100){
+      // turn green LED on:
+      digitalWrite(LEDPin2, HIGH);
+    }else{// turn green LED off:
+      digitalWrite(LEDPin2, LOW);
+      }
+    } else {
+      // turn green LED off:
+      digitalWrite(LEDPin2, LOW);
+    }
+  } else {
+    // turn LED off:
+    digitalWrite(LEDPin1, LOW);
+    digitalWrite(LEDPin2, LOW);
+    analogWrite(LEDPin3, 0);
+  }
+  if (sensorState && !lastState) {
+    Serial.println("Unbroken");
+  }
+  if (!sensorState && lastState) {
+    Serial.println("Broken");
+  }
+  lastState = sensorState;
+}
