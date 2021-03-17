@@ -1,0 +1,195 @@
+// LED 
+// ultrasonic mist maker
+#include <VL53L1X.h>
+
+VL53L1X sensor;
+VL53L1X sensor2;
+
+#include <FastLED.h>
+#define LED_PIN     6
+#define NUM_LEDS    16
+CRGB leds[NUM_LEDS];
+
+
+
+int atomizationPin1 = 7;
+int atomizationPin2 = 8;
+void setup() {
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  digitalWrite(4, LOW);
+  digitalWrite(5, LOW);
+  Wire.begin();
+
+pinMode(atomizationPin1, OUTPUT);
+pinMode(atomizationPin2, OUTPUT);
+  Serial.begin (9600);
+
+
+  //VL53L1X I2C address setting
+  pinMode(4, INPUT);
+  Serial.println("00");
+  sensor.init(true);
+
+  Serial.println("01");
+  sensor.setAddress(0x28);
+  Serial.println("02");
+
+  pinMode(5, INPUT);
+  sensor2.init(true);
+  Serial.println("03");
+  sensor2.setAddress(0x31);
+  Serial.println("04");
+
+  sensor.setDistanceMode(VL53L1X::Long);
+  sensor.setMeasurementTimingBudget(50000);
+  sensor.startContinuous(50);
+  sensor2.setDistanceMode(VL53L1X::Long);
+  sensor2.setMeasurementTimingBudget(50000);
+  sensor2.startContinuous(50);
+  sensor.setTimeout(100);
+  sensor2.setTimeout(100);
+
+
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+  LEDS.setBrightness(96);
+}
+
+void loop() {
+
+int distanceLED = sensor.read();
+  Serial.print("distanceLED: ");
+  Serial.print(distanceLED);
+  if (sensor.timeoutOccurred()) {
+    Serial.print(" TIMEOUT");
+  }
+  Serial.println();
+
+  //LED control
+  if (distanceLED <= 0 || distanceLED > 350 ) {
+    //LED blink
+    leds[0] = CRGB(100, 100, 100);
+    leds[2] = CRGB(100, 100, 100);
+    leds[4] = CRGB(100, 100, 100);
+    leds[6] = CRGB(100, 100, 100);
+    leds[8] = CRGB(100, 100, 100);
+    leds[10] = CRGB(100, 100, 100);
+    leds[12] = CRGB(100, 100, 100);
+    leds[14] = CRGB(100, 100, 100);
+    leds[16] = CRGB(100, 100, 100);
+    leds[1] = CRGB(100, 100, 100);
+    leds[3] = CRGB(100, 100, 100);
+    leds[5] = CRGB(100, 100, 100);
+    leds[7] = CRGB(100, 100, 100);
+    leds[9] = CRGB(100, 100, 100);
+    leds[11] = CRGB(100, 100, 100);
+    leds[13] = CRGB(100, 100, 100);
+    leds[15] = CRGB(100, 100, 100);
+    FastLED.show();
+    delay(500);
+    // Now turn the LED off, then pause
+    leds[0] = CRGB::Black;
+    leds[2] = CRGB::Black;
+    leds[4] = CRGB::Black;
+    leds[6] = CRGB::Black;
+    leds[8] = CRGB::Black;
+    leds[10] = CRGB::Black;
+    leds[12] = CRGB::Black;
+    leds[14] = CRGB::Black;
+    leds[16] = CRGB::Black;
+    leds[1] = CRGB::Black;
+    leds[3] = CRGB::Black;
+    leds[5] = CRGB::Black;
+    leds[7] = CRGB::Black;
+    leds[9] = CRGB::Black;
+    leds[11] = CRGB::Black;
+    leds[13] = CRGB::Black;
+    leds[15] = CRGB::Black;
+
+    FastLED.show();
+    delay(500);
+
+  } else if  (distanceLED > 0 && distanceLED <= 350) {
+    //led changing color
+    int colorRGB1;
+    colorRGB1 = map(distanceLED, 0, 355, 0, 255);
+    leds[0] = CRGB(150, colorRGB1, colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[1] = CRGB(150, colorRGB1, colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[2] = CRGB(150, colorRGB1, colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[3] = CRGB(150, colorRGB1, colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[4] = CRGB(150, colorRGB1, colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[5] = CRGB(150, colorRGB1, colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[6] = CRGB(150, colorRGB1, colorRGB1);
+    FastLED.show();
+
+    leds[7] = CRGB(150, colorRGB1, colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[8] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[9] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[10] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[11] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[12] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[13] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[14] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[15] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+    leds[16] = CRGB(150, colorRGB1, 255 - colorRGB1);
+    FastLED.show();
+    delay(1);
+  }
+
+
+ int distanceH = sensor2.read();
+  Serial.print("distanceHumidifier: ");
+  Serial.print(distanceH);
+  if (sensor2.timeoutOccurred()) {
+    Serial.print(" TIMEOUT");
+  }
+  Serial.println();
+
+ if(distanceH >40  && distanceH < 300){
+   digitalWrite(atomizationPin1, HIGH);
+ }else{
+  digitalWrite(atomizationPin1, LOW);
+  
+ }
+//  if(distanceH >10 && distanceH < 50){
+//    digitalWrite(atomizationPin1, HIGH);
+//  }else if (distanceH >=50 && distanceH < 120){
+//    digitalWrite(atomizationPin1, HIGH);
+//    digitalWrite(atomizationPin2, HIGH);
+//    }else{
+//      
+//    digitalWrite(atomizationPin1, LOW);
+//    digitalWrite(atomizationPin2, LOW);
+//  }
+//  
+}
