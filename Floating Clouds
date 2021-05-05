@@ -1,0 +1,193 @@
+#include "MUX74HC4067.h"
+MUX74HC4067 mux1(8, 9, 10, 11, 12);
+MUX74HC4067 mux2(2, 3, 4, 5, 6);
+
+#include <FastLED.h>
+#define LED_PIN     40
+#define NUM_LEDS    112
+CRGB leds[NUM_LEDS];
+
+int sensor33 = A2;
+int sensor34 = A3;
+int sensor35 = A4;
+int sensor36 = A5;
+int sensor37 = A6;
+int sensor38 = A7;
+int sensor39 = A8;
+int sensor40 = A9;
+
+int reading33 = 0;
+int reading34 = 0;
+int reading35 = 0;
+int reading36 = 0;
+int reading37 = 0;
+int reading38 = 0;
+int reading39 = 0;
+int reading40 = 0;
+
+const int rows = 32;
+const int columns = 8;
+int arrayLED[rows][columns] = {{0, 1}, {2, 3}, {4, 5, 6, 7, 8}, {9, 10}, {11, 12, 13}, {14}, {15, 16, 17, 18}, {19, 20, 21, 22, 23, 24}, {25}, {26, 27, 28}, {29, 30, 31, 32, 33}, {34, 35}, {36, 37, 38, 39}, {40, 41, 42}, {43}, {44}, {45}, {46, 47}, {48, 49, 50, 51, 52, 53}, {54, 55}, {56, 57}, {58, 58, 60, 61, 62, 63, 64, 65}, {66, 67, 68}, {69, 70, 71, 72}, {73, 74, 75, 76}, {77, 78, 79}, {80, 81, 82, 83}, {84}, {85, 86, 87}, {88, 89, 90}, {91}, {92, 93}};
+
+void setup() {
+  pinMode(sensor33, INPUT);
+  pinMode(sensor33, INPUT);
+  pinMode(sensor35, INPUT);
+  pinMode(sensor36, INPUT);
+  pinMode(sensor37, INPUT);
+  pinMode(sensor38, INPUT);
+  pinMode(sensor39, INPUT);
+  pinMode(sensor40, INPUT);
+
+
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+  LEDS.setBrightness(70);
+  Serial.begin(9600);  // Initializes serial port
+  // Waits for serial port to connect. Needed for Leonardo only
+  while ( !Serial ) ;
+
+
+  mux1.signalPin(A1, INPUT, ANALOG);
+  //mux2.signalPin(A0, INPUT, ANALOG);
+}
+
+// Reads the 16 channels and reports on the serial monitor
+// the corresponding value read by the A/D converter
+void loop() {
+  int data1;
+  int data2;
+  int ledIndex = 0;
+
+  // mux1, sensor 0~15
+  for (int i = 0 ; i < 1; i++) {
+    data1 = mux1.read(i);
+    Serial.print(i);
+    Serial.print("is at ");
+    Serial.println(data1);
+    //Serial.println(data2);
+
+    if (data1 < 80) {
+      for (int j = 0; j < columns; j++) {
+        ledIndex = arrayLED[i][j];
+        //Serial.print(ledIndex);
+        //Serial.println("turn on");
+        leds[ledIndex] = CRGB(255, 255, 255);
+      }
+
+    } else {
+      for (int j = 0; j < columns; j++) {
+        ledIndex = arrayLED[i][j];
+        //     Serial.print(ledIndex);
+        //        Serial.println("turn off");
+        leds[ledIndex] = CRGB(0, 0, 0);
+      }
+    }
+  }
+
+  // mux2 sensor 16~31
+  for (int i = 16 ; i < 32; i++) {
+    data2 = mux2.read(i);
+    Serial.print(i);
+    Serial.print(" is at ");
+    Serial.println(data2);
+    //Serial.println(data);
+
+    if (data2 < 10) {
+      for (int j = 0; j < columns; j++) {
+        ledIndex = arrayLED[i][j];
+        //        Serial.print(ledIndex);
+        //        Serial.println("turn on");
+        leds[ledIndex] = CRGB(255, 255, 255);
+      }
+
+    } else {
+      for (int j = 0; j < columns; j++) {
+        ledIndex = arrayLED[i][j];
+        //        Serial.print(ledIndex);
+        //        Serial.println("turn off");
+        leds[ledIndex] = CRGB(0, 0, 0);
+      }
+
+      //sensor 32~39
+      reading33 = analogRead(sensor33);
+      if (reading33 < 10) {
+        leds[94] = CRGB(255, 255, 255);
+        leds[95] = CRGB(255, 255, 255);
+      } else {
+        leds[94] = CRGB(0, 0, 0);
+        leds[95] = CRGB(0, 0, 0);
+      }
+
+      reading34 = analogRead(sensor34);
+      if (reading34 < 10) {
+        leds[96] = CRGB(255, 255, 255);
+        leds[97] = CRGB(255, 255, 255);
+      } else {
+        leds[96] = CRGB(0, 0, 0);
+        leds[97] = CRGB(0, 0, 0);
+      }
+
+      reading35 = analogRead(sensor35);
+      if (reading35 < 10) {
+        leds[98] = CRGB(255, 255, 255);
+        leds[99] = CRGB(255, 255, 255);
+        leds[100] = CRGB(255, 255, 255);
+      } else {
+        leds[98] = CRGB(0, 0, 0);
+        leds[99] = CRGB(0, 0, 0);
+        leds[100] = CRGB(0, 0, 0);
+      }
+
+      reading36 = analogRead(sensor36);
+      if (reading36 < 10) {
+        leds[101] = CRGB(255, 255, 255);
+        leds[102] = CRGB(255, 255, 255);
+        leds[103] = CRGB(255, 255, 255);
+      } else {
+        leds[101] = CRGB(0, 0, 0);
+        leds[102] = CRGB(0, 0, 0);
+        leds[103] = CRGB(0, 0, 0);
+      }
+
+      reading37 = analogRead(sensor37);
+      if (reading37 < 10) {
+        leds[104] = CRGB(255, 255, 255);
+        leds[105] = CRGB(255, 255, 255);
+        leds[106] = CRGB(255, 255, 255);
+        leds[107] = CRGB(255, 255, 255);
+      } else {
+        leds[104] = CRGB(0, 0, 0);
+        leds[105] = CRGB(0, 0, 0);
+        leds[106] = CRGB(0, 0, 0);
+        leds[107] = CRGB(0, 0, 0);
+      }
+
+
+      reading38 = analogRead(sensor38);
+      if (reading38 < 10) {
+        leds[108] = CRGB(255, 255, 255);
+        leds[109] = CRGB(255, 255, 255);
+      } else {
+        leds[108] = CRGB(0, 0, 0);
+        leds[109] = CRGB(0, 0, 0);
+      }
+
+      reading39 = analogRead(sensor39);
+      if (reading39 < 10) {
+        leds[110] = CRGB(255, 255, 255);
+      } else {
+        leds[110] = CRGB(0, 0, 0);
+      }
+
+      reading40 = analogRead(sensor40);
+      if (reading40 < 10) {
+        leds[111] = CRGB(255, 255, 255);
+      } else {
+        leds[111] = CRGB(0, 0, 0);
+      }
+
+      FastLED.show();
+      delay(1000);
+
+    }
+
